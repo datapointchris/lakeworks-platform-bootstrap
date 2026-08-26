@@ -11,10 +11,13 @@ resource "aws_organizations_organization" "this" {
     "sso.amazonaws.com",           # IAM Identity Center, the login path
     "account.amazonaws.com",       # alternate contacts on member accounts
     "cloudtrail.amazonaws.com",    # one organization trail rather than one per account
-    "lakeformation.amazonaws.com", # cross-account data sharing, the data-mesh mechanism
-    "ram.amazonaws.com",           # what Lake Formation shares through
+    "ram.amazonaws.com",           # Resource Access Manager — how Lake Formation shares
     "servicequotas.amazonaws.com", # quota increases without a ticket per account
   ]
+
+  # Lake Formation has no trusted-access principal of its own — Organizations rejects
+  # `lakeformation.amazonaws.com` as unrecognized. Cross-account data sharing is a RAM
+  # operation, so `ram.amazonaws.com` above is what enables the data-mesh mechanism.
 
   lifecycle {
     # An organization is not a thing to lose to a stray plan. Removing it would orphan every member

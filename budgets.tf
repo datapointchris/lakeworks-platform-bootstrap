@@ -54,17 +54,25 @@ resource "aws_budgets_budget" "monthly_forecast" {
 
 # Catches a change in the *shape* of spend that a threshold misses — a new service appearing, or a
 # cheap service becoming expensive while the total stays under budget.
+#
+# Gated because Cost Explorer is opt-in per account and cannot be enabled through the API. A fresh
+# account rejects these with `User not enabled for cost explorer access`, and after opting in it
+# takes up to 24 hours before the data backing an anomaly monitor exists. Flip the variable then.
 resource "aws_ce_anomaly_monitor" "lakeworks" {
+  count = var.enable_cost_anomaly_detection ? 1 : 0
+
   name              = "lakeworks-services"
   monitor_type      = "DIMENSIONAL"
   monitor_dimension = "SERVICE"
 }
 
 resource "aws_ce_anomaly_subscription" "lakeworks" {
+  count = var.enable_cost_anomaly_detection ? 1 : 0
+
   name      = "lakeworks-anomalies"
   frequency = "DAILY"
 
-  monitor_arn_list = [aws_ce_anomaly_monitor.lakeworks.arn]
+  monitor_arn_list = [aws_ce_anomaly_monitor.lakeworks[0].arn]
 
   subscriber {
     type    = "EMAIL"

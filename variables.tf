@@ -46,6 +46,12 @@ variable "monthly_budget_usd" {
   default     = 20
 }
 
+variable "enable_cost_anomaly_detection" {
+  description = "Create the Cost Explorer anomaly monitor. Requires Cost Explorer to have been enabled on the account, which is a one-time console action that cannot be done through the API, and up to 24 hours for its data to become available. Off until then; the budgets do not depend on it."
+  type        = bool
+  default     = false
+}
+
 variable "alert_email" {
   description = "Where budget and anomaly alerts land."
   type        = string
