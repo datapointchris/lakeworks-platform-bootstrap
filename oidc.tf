@@ -76,3 +76,27 @@ resource "aws_iam_role_policy" "github_plan_state" {
   role   = aws_iam_role.github_plan.id
   policy = data.aws_iam_policy_document.github_plan_state.json
 }
+
+# Planning a member account is a second hop: GitHub federates into this role, and this role assumes
+# a read-only role in the account being planned. `ReadOnlyAccess` grants three STS actions —
+# GetAccessKeyInfo, GetCallerIdentity and GetSessionToken — and `sts:AssumeRole` is not one of them,
+# so without this every member-account plan fails at the hop rather than at the plan.
+#
+# Scoped by name pattern rather than to one role, because member-account roles are created by the
+# repos that own those accounts and their names are not decided here. The grant is half the gate:
+# a role is assumable only if its own trust policy also names this one, so a role that never opted
+# in stays unreachable.
+data "aws_iam_policy_document" "github_plan_assume" {
+  statement {
+    sid       = "AssumeMemberPlanRoles"
+    effect    = "Allow"
+    actions   = ["sts:AssumeRole"]
+    resources = ["arn:aws:iam::${aws_organizations_account.dev.id}:role/lakeworks-*-plan-role"]
+  }
+}
+
+resource "aws_iam_role_policy" "github_plan_assume" {
+  name   = "assume-member-plan-roles"
+  role   = aws_iam_role.github_plan.id
+  policy = data.aws_iam_policy_document.github_plan_assume.json
+}
