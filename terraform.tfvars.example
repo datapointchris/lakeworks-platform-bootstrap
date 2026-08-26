@@ -1,0 +1,15 @@
+# Copy to terraform.tfvars (gitignored) and fill in.
+
+# The lakeworks Organization management account. providers.tf refuses to run if your credentials
+# name a different account, so this is a safety interlock rather than a convenience.
+management_account_id = "000000000000"
+
+# Must match the -backend-config passed to terraform init.
+state_bucket = "lakeworks-tfstate-000000000000"
+
+# A Fastmail alias. AWS refuses an address any account has used, and closing an account consumes
+# its address for roughly 90 days.
+dev_account_email = "aws-lakeworks-dev@example.com"
+
+# Where budget and anomaly alerts land.
+alert_email = "you@example.com"

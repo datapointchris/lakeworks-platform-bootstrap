@@ -1,0 +1,88 @@
+# Plan on PR is the review mechanism here, not a CI nicety. Applies are run by hand, so this is
+# where a change is actually seen before it becomes real.
+#
+# ORDERING: this workflow assumes the `lakeworks-github-plan` role, which this repo's own first
+# apply creates. It therefore cannot run until bootstrap has been applied once by hand. That is
+# inherent to bootstrapping and not a defect — every later repo has the role from day one.
+name: Plan
+
+on:
+  pull_request:
+
+# id-token for OIDC, pull-requests to post the plan back. Deliberately no `contents: write`.
+permissions:
+  id-token: write
+  contents: read
+  pull-requests: write
+
+concurrency:
+  # One plan per PR. A second push while a plan is running would race for the state lock.
+  group: plan-${{ github.event.pull_request.number }}
+  cancel-in-progress: true
+
+jobs:
+  plan:
+    runs-on: [self-hosted, private-ci]
+    steps:
+      - uses: actions/checkout@v7
+
+      - uses: aws-actions/configure-aws-credentials@v4
+        with:
+          # Repository variable, not a literal. An account id in a workflow file is
+          # a permanent disclosure in a public repo and a rename away from breaking.
+          role-to-assume: ${{ vars.AWS_PLAN_ROLE_ARN }}
+          aws-region: us-east-2
+
+      - uses: hashicorp/setup-terraform@v3
+        with:
+          terraform_wrapper: false
+
+      - run: terraform fmt -check -recursive
+
+      - run: terraform init
+
+      - run: terraform validate
+
+      - name: plan
+        id: plan
+        run: |
+          set -o pipefail
+          terraform plan -no-color -input=false \
+            -var "dev_account_email=${{ vars.DEV_ACCOUNT_EMAIL }}" \
+            -var "alert_email=${{ vars.ALERT_EMAIL }}" \
+            2>&1 | tee plan.txt
+        continue-on-error: true
+
+      - name: comment
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const fs = require('fs');
+            let plan = fs.readFileSync('plan.txt', 'utf8');
+            // A PR comment caps at 65536 characters. Truncate from the front so the summary line,
+            // which terraform prints last, always survives.
+            const cap = 60000;
+            if (plan.length > cap) {
+              plan = '...truncated, see the workflow log for the full plan...\n\n' + plan.slice(-cap);
+            }
+            const body = [
+              '### Terraform plan — `' + '${{ steps.plan.outcome }}' + '`',
+              '',
+              '<details><summary>Show plan</summary>',
+              '',
+              '```terraform',
+              plan,
+              '```',
+              '',
+              '</details>',
+            ].join('\n');
+            await github.rest.issues.createComment({
+              issue_number: context.issue.number,
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              body,
+            });
+
+      - name: fail if the plan failed
+        if: steps.plan.outcome == 'failure'
+        run: exit 1
