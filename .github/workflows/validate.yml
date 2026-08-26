@@ -13,7 +13,7 @@ permissions:
 jobs:
 
   terraform:
-    runs-on: [self-hosted, private-ci]
+    runs-on: ubuntu-latest
     steps:
 
       - uses: actions/checkout@v7
