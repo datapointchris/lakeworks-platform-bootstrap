@@ -33,12 +33,21 @@ data "aws_iam_policy_document" "github_plan_trust" {
 
     # Without this the role is assumable from any repository on GitHub, which is the single most
     # common way an OIDC role is misconfigured.
+    # The subject carries a numeric owner id and repository id, each appended to the name it
+    # follows with `@`:
+    #
+    #   repo:<owner>@<owner-id>/<repo>@<repo-id>:pull_request
+    #
+    # Those ids defeat name reuse — a deleted account or repository whose name someone else
+    # re-registers presents a different id. The owner id is pinned because it is one stable value;
+    # the repository id is wildcarded because a new repo has one nobody can know in advance, and
+    # the name prefix beside it is what selects the set.
     condition {
       test     = "StringLike"
       variable = "token.actions.githubusercontent.com:sub"
       values = [
-        "repo:${var.github_owner}/lakeworks-*:*",
-        "repo:${var.github_owner}/terraform-aws-lakeworks-*:*",
+        "repo:${var.github_owner}@${var.github_owner_id}/lakeworks-*:*",
+        "repo:${var.github_owner}@${var.github_owner_id}/terraform-aws-lakeworks-*:*",
       ]
     }
   }

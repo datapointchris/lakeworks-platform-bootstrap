@@ -40,6 +40,17 @@ variable "github_owner" {
   default     = "datapointchris"
 }
 
+variable "github_owner_id" {
+  description = "Numeric id of that owner, which the OIDC subject carries beside the name. Read it with `gh api users/<owner> --jq .id`, or from any repo's `actions/oidc/customization/sub` endpoint, whose `sub_claim_prefix` is the literal prefix a token will present."
+  type        = string
+  default     = "49924492"
+
+  validation {
+    condition     = can(regex("^[0-9]+$", var.github_owner_id))
+    error_message = "github_owner_id must be digits only."
+  }
+}
+
 variable "monthly_budget_usd" {
   description = "Actual-spend alarm threshold. cost.md targets under $20 steady state, with exercise months allowed to reach $40."
   type        = number
