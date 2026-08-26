@@ -39,7 +39,9 @@ jobs:
 
       - run: terraform fmt -check -recursive
 
-      - run: terraform init
+      # The backend is partial: the bucket carries an account id, which does not go in a tracked
+      # file. Without it here `init` has no bucket to reach and cannot resolve the backend at all.
+      - run: terraform init -input=false -backend-config="bucket=${{ vars.TF_STATE_BUCKET }}"
 
       - run: terraform validate
 
@@ -48,6 +50,8 @@ jobs:
         run: |
           set -o pipefail
           terraform plan -no-color -input=false \
+            -var "management_account_id=${{ vars.MANAGEMENT_ACCOUNT_ID }}" \
+            -var "state_bucket=${{ vars.TF_STATE_BUCKET }}" \
             -var "dev_account_email=${{ vars.DEV_ACCOUNT_EMAIL }}" \
             -var "alert_email=${{ vars.ALERT_EMAIL }}" \
             2>&1 | tee plan.txt
