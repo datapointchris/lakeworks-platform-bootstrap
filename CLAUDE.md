@@ -1,9 +1,7 @@
-# CLAUDE.md
+# lakeworks-platform-bootstrap
 
-Guidance for Claude Code working in this repository.
-
-Read the README first. It carries why the organization is standalone, why this is a separate repo
-from `lakeworks-platform-core`, and the one-time setup steps that cannot be automated.
+The README carries why the organization is standalone, why this is a separate repo from
+`lakeworks-platform-core`, and the one-time setup steps that cannot be automated.
 
 ## This repo is applied by hand
 
