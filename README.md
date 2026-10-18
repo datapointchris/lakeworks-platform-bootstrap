@@ -217,6 +217,9 @@ gh variable set DEV_ACCOUNT_EMAIL     --body "<dev_account_email from terraform.
 gh variable set ALERT_EMAIL           --body "<alert_email from terraform.tfvars>"
 ```
 
+The plan takes `github_owner` and `github_owner_id` from the repository it runs in. A fork's plan
+names the fork's owner with no variable to set.
+
 `.github/workflows/validate.yml` runs on pull requests and pushes to `main`, with no AWS
 credentials. It initializes without a backend and runs the hooks in `.pre-commit-config.yaml` over
 the change.

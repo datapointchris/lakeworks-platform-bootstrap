@@ -47,6 +47,10 @@ jobs:
 
       - name: plan
         id: plan
+        # So a fork plans its own owner into the trust policy rather than the defaults in variables.tf.
+        env:
+          TF_VAR_github_owner: ${{ github.repository_owner }}
+          TF_VAR_github_owner_id: ${{ github.repository_owner_id }}
         run: |
           set -o pipefail
           terraform plan -no-color -input=false \
