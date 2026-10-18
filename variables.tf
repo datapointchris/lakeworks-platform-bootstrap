@@ -5,7 +5,7 @@ variable "region" {
 }
 
 variable "management_account_id" {
-  description = "The lakeworks Organization management account. Holds billing, state and identity, and no workload — SCPs cannot reach a management account, so nothing that needs guarding may live in it. No default: this must be stated, and providers.tf refuses to run against a different account."
+  description = "The lakeworks Organization management account. Holds billing, state and identity, and no workload — SCPs cannot reach a management account, so nothing that needs guarding may live in it. No default: this must be stated. providers.tf warns when the credentials name a different account, and the warning does not stop a plan or an apply."
   type        = string
 
   validation {
@@ -52,7 +52,7 @@ variable "github_owner_id" {
 }
 
 variable "monthly_budget_usd" {
-  description = "Actual-spend alarm threshold. cost.md targets under $20 steady state, with exercise months allowed to reach $40."
+  description = "Actual-spend alarm threshold. Steady-state spend targets under $20 a month. A month that runs Redshift, Kinesis or EMR may reach $40. Anything above that is a defect to diagnose."
   type        = number
   default     = 20
 }

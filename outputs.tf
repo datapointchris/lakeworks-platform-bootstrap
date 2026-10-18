@@ -3,7 +3,7 @@ output "organization_id" {
 }
 
 output "dev_account_id" {
-  description = "Needed by every other repo's provider config. Read from SSM rather than remote state — remote state would give each pipeline read access to this whole file."
+  description = "The account lakeworks-platform-core's provider assumes into, passed to it as its dev_account_id variable. Passed by value rather than read through remote state, which would give each consumer read access to this whole file."
   value       = aws_organizations_account.dev.id
 }
 

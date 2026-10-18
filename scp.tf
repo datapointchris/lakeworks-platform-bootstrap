@@ -1,5 +1,5 @@
-# One region, enforced. The cost model in cost.md assumes a single region, and a resource created
-# in another is both invisible on the dashboards and outside the budget's blast radius.
+# One region, enforced. The cost model assumes a single region, and a resource created in another
+# is both invisible on the dashboards and outside the budget's blast radius.
 #
 # Deliberately narrow: global services have no region and would break under a blanket deny, so they
 # are excluded by name rather than by guessing.

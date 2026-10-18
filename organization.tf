@@ -34,8 +34,9 @@ resource "aws_organizations_account" "dev" {
   # lakeworks repo arrives through it.
   role_name = "OrganizationAccountAccessRole"
 
-  # Terraform removes the account from state rather than closing it. That is the safe default and
-  # it is why this is not `prevent_destroy` — a destroy here is recoverable, unlike the org.
+  # A destroy removes the account from the organization rather than closing it. The account stands
+  # alone and can be invited back. That is why this is not `prevent_destroy` — a destroy here is
+  # recoverable, unlike the org.
   close_on_deletion = false
 
   parent_id = aws_organizations_organization.this.roots[0].id

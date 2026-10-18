@@ -38,7 +38,8 @@ created here, and only a later apply can assume into it. This is inherent, not a
 to engineer around.
 
 **The state bucket holds the state that manages the state bucket.** It is created once by hand with
-a single CLI call and adopted with `import` blocks. Do not try to make the first apply create it.
+the `aws s3api` calls in the README's first run, and adopted with `import` blocks. Do not try to
+make the first apply create it.
 
 ## Permissions boundaries worth keeping
 

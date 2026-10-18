@@ -1,6 +1,7 @@
 # The bootstrap paradox: Terraform needs a state bucket, and the state bucket is Terraform's to
 # create. Resolved by creating it with `aws s3api` before the first init and adopting it here —
-# cleaner than committing local state, and `import` was already on the curriculum in terraform.md.
+# cleaner than committing local state, and the same `import` move that brings any console-created
+# resource under management.
 #
 # On a second apply these import blocks are no-ops, so they stay in the file as the record of how
 # the bucket got here.

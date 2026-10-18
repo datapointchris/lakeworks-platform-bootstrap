@@ -1,7 +1,7 @@
 # Copy to terraform.tfvars (gitignored) and fill in.
 
-# The lakeworks Organization management account. providers.tf refuses to run if your credentials
-# name a different account, so this is a safety interlock rather than a convenience.
+# The lakeworks Organization management account. providers.tf warns if your credentials name a
+# different account. The warning does not stop a plan or an apply, so read it before applying.
 management_account_id = "000000000000"
 
 # Must match the -backend-config passed to terraform init.
