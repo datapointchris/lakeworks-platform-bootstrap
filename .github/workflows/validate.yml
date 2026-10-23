@@ -1,4 +1,4 @@
-# forge-toolchain: 49
+# forge-toolchain: 52
 name: CI
 
 on:
@@ -226,7 +226,7 @@ jobs:
             bats
             codespell
             refcheck
-            actionlint
+            jactionlint
             terraform_validate
             terraform_fmt
             tflint
