@@ -28,9 +28,9 @@ happen in the console.
    six months or when its credits run out, whichever comes first. AWS deletes it 90 days later
    unless it is upgraded. An account inside an organization is on the Paid plan, so `dev` never
    faces the choice.
-2. **Give each account a real email alias, not a plus-address.** A root email is load-bearing for
-   the life of the account. AWS refuses an address another account already holds. The management
-   account takes one. `dev` takes another, as `dev_account_email`.
+2. **Give each account a real email alias, not a plus-address.** A root email is the root user's
+   login and recovery address for the life of the account. AWS refuses an address another account
+   already holds. The management account takes one. `dev` takes another, as `dev_account_email`.
 3. **Turn on MFA for the root user, then stop using root.**
 4. **Create the Terraform credential.** As root, create one IAM user with `AdministratorAccess` and
    MFA, and an access key for it.
@@ -88,7 +88,8 @@ once in the Billing console, which no API can do. Its data then takes up to 24 h
 that, set `enable_cost_anomaly_detection = true` and apply again.
 
 **The access key is the weakest part of this setup, and deliberately so.** Something has to hold the
-first credential. That key is the thing worth guarding.
+first credential. That key carries `AdministratorAccess` in the management account, where no SCP
+reaches, so guard it.
 
 ## The management account holds no workload, because no SCP reaches it
 
@@ -118,8 +119,7 @@ The split is about CI credentials, not tidiness.
 CI role would need `organizations:CreateAccount`. A compromised workflow could then create AWS
 accounts on the bill. Here a person creates the account. The CI role never holds that permission.
 
-The OIDC provider is the boundary case. It lives here, because CI cannot run anything until it
-exists.
+The OIDC provider serves CI and still lives here, because CI cannot run anything until it exists.
 
 ## The first apply puts the guardrails up before anything can spend
 

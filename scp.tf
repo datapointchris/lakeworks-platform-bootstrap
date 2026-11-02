@@ -1,5 +1,5 @@
-# One region, enforced. The cost model assumes a single region, and a resource created in another
-# is both invisible on the dashboards and outside the budget's blast radius.
+# One region, enforced, so every resource lakeworks runs sits in the region its spend was planned
+# for. The budgets count every region either way: neither carries a region filter.
 #
 # Deliberately narrow: global services have no region and would break under a blanket deny, so they
 # are excluded by name rather than by guessing.

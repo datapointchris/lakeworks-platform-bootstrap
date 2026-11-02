@@ -25,11 +25,9 @@ provider "tls" {}
 
 data "aws_caller_identity" "current" {}
 
-# Names the wrong account before anything is created in it. A stale profile would otherwise apply
-# the lakeworks organization into whatever account the credentials happen to name, and creating an
-# organization is not an action to discover after the fact. A failed check is a warning: the plan
-# prints both account ids and carries on, through apply as well. So the plan's warnings are read
-# before it is applied.
+# Without this, a stale profile would apply the lakeworks organization into whatever account the
+# credentials happen to name. A failed check is only a warning: the plan prints both account ids
+# and carries on, through apply as well, so read the plan's warnings before applying it.
 check "running_in_the_management_account" {
   assert {
     condition     = data.aws_caller_identity.current.account_id == var.management_account_id
