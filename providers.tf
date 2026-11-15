@@ -31,6 +31,6 @@ data "aws_caller_identity" "current" {}
 check "running_in_the_management_account" {
   assert {
     condition     = data.aws_caller_identity.current.account_id == var.management_account_id
-    error_message = "Credentials are for account ${data.aws_caller_identity.current.account_id}, but management_account_id is ${var.management_account_id}. Check your AWS profile."
+    error_message = "Credentials are for account ${data.aws_caller_identity.current.account_id}, but management_account_id is ${var.management_account_id}. `aws sts get-caller-identity` prints the account the current credentials reach. Switch to the management account's profile with `export AWS_PROFILE=<profile>`, or correct management_account_id in terraform.tfvars."
   }
 }
