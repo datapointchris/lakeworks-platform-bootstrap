@@ -1,8 +1,6 @@
 # One region, enforced, so every resource lakeworks runs sits in the region its spend was planned
 # for. The budgets count every region either way: neither carries a region filter.
 #
-# Deliberately narrow: global services have no region and would break under a blanket deny, so they
-# are excluded by name rather than by guessing.
 # `not_actions` only. A statement carries Action or NotAction, never both — setting `actions`
 # alongside it emits an invalid document that Organizations rejects as malformed rather than
 # describing which half is wrong.
