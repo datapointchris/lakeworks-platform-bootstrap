@@ -30,7 +30,7 @@ variable "dev_account_email" {
 
   validation {
     condition     = can(regex("^[^@[:space:]]+@[^@[:space:]]+\\.[^@[:space:]]+$", var.dev_account_email))
-    error_message = "dev_account_email must be a single valid email address."
+    error_message = "dev_account_email \"${var.dev_account_email}\" is not shaped like name@domain.tld: one @, a dot somewhere after it, and no spaces. Set it in terraform.tfvars (copied from terraform.tfvars.example) or pass -var dev_account_email=<address>."
   }
 }
 
