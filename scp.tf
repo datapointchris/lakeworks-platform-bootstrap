@@ -37,7 +37,7 @@ data "aws_iam_policy_document" "region_lock" {
 
 resource "aws_organizations_policy" "region_lock" {
   name        = "lakeworks-region-lock"
-  description = "Deny anything outside us-east-2, excepting global services and the us-east-1-only APIs."
+  description = "Deny anything outside ${var.region}, excepting global services and the us-east-1-only APIs."
   type        = "SERVICE_CONTROL_POLICY"
   content     = data.aws_iam_policy_document.region_lock.json
 }
