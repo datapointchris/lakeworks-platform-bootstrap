@@ -23,19 +23,14 @@ step when adding a variable.
 
 ## What must never move into this account
 
-The management account holds billing, Organizations, the state bucket, the OIDC provider and the
-budgets. **No workload, ever.** Service control policies do not apply to the management account, so
-anything placed here sits permanently outside every guardrail including the region lock. Adding a
-bucket or a role "just for now" is what makes the guardrails decorative.
-
-Workload infrastructure belongs in a member account, applied by `lakeworks-platform-core` or a
-pipeline repo.
+**No workload, ever, not even "just for now".** Workload infrastructure belongs in a member account,
+applied by `lakeworks-platform-core` or a pipeline repo. The README's "The management account holds
+no workload, because no SCP reaches it" says why.
 
 ## Two structural constraints that look like bugs
 
-**A provider config cannot depend on a resource created in the same apply.** The member account is
-created here, and only a later apply can assume into it. This is inherent, not a sequencing mistake
-to engineer around.
+**Do not make one apply create `dev` and assume into it.** The README's "The `dev` account exists
+before anything can assume into it" says why Terraform cannot.
 
 **The state bucket holds the state that manages the state bucket.** It is created once by hand with
 the `aws s3api` calls in the README's first run, and adopted with `import` blocks. Do not try to
@@ -48,13 +43,6 @@ role never holds `organizations:CreateAccount` — a compromised workflow must n
 accounts on the bill. Do not widen that role to make a workflow succeed; the workflow is supposed
 to stop at plan.
 
-`ReadOnlyAccess` grants no `sts:AssumeRole`. A read-only role that must hop into a member account
-needs the grant added explicitly, and its absence presents as a confusing denial on the second hop
-rather than on the first.
-
-## OIDC subjects carry ids, not just names
-
-GitHub's subject claim appends a numeric owner id and repository id to the names they follow, so a
-trust policy matching on the plain `owner/repo` form matches nothing. Match the id-bearing form.
-The repository's own OIDC customization endpoint returns the literal prefix without exchanging a
-token, which is the cheapest way to confirm the shape.
+Keep the plan role's explicit `sts:AssumeRole` grant, and match trust policies on GitHub's
+id-bearing OIDC subject, never the plain `owner/repo` form. The README's "The CI role plans, and
+only a person applies" gives the reason for each and the command that prints a repo's subject prefix.
