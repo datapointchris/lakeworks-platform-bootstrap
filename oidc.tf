@@ -66,6 +66,10 @@ resource "aws_iam_role_policy_attachment" "github_plan_read" {
 
 # A plan reads state and writes the lock. Without the write it cannot acquire one, and concurrent
 # plans would race on the same key.
+#
+# The backend's native locking keeps each lock as `<state key>.tflock` beside the state, so writes are
+# scoped to that suffix. A state file itself stays read-only to this role, which is what keeps it
+# from applying.
 data "aws_iam_policy_document" "github_plan_state" {
   statement {
     effect    = "Allow"
@@ -74,9 +78,17 @@ data "aws_iam_policy_document" "github_plan_state" {
   }
 
   statement {
+    sid       = "ReadState"
     effect    = "Allow"
-    actions   = ["s3:GetObject", "s3:PutObject", "s3:DeleteObject"]
+    actions   = ["s3:GetObject"]
     resources = ["${aws_s3_bucket.state.arn}/*"]
+  }
+
+  statement {
+    sid       = "WriteLock"
+    effect    = "Allow"
+    actions   = ["s3:PutObject", "s3:DeleteObject"]
+    resources = ["${aws_s3_bucket.state.arn}/*.tflock"]
   }
 }
 
